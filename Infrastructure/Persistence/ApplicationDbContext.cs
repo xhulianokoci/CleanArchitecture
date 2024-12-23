@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CleanArchitecture;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;
 
@@ -9,5 +10,5 @@ public class ApplicationDbContext : DbContext
     {
     }
 
-    //public DbSet<Test> YourEntities { get; set; }
+    public DbSet<WeatherForecast> WeatherForecasts { get; set; }
 }

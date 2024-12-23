@@ -1,33 +1,55 @@
+using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CleanArchitecture.Controllers
+namespace CleanArchitecture.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class WeatherForecastController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    private readonly IWeatherForecastService _service;
+
+    public WeatherForecastController(IWeatherForecastService service)
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        _service = service;
+    }
 
-        private readonly ILogger<WeatherForecastController> _logger;
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        var forecasts = await _service.GetWeatherForecastsAsync();
+        return Ok(forecasts);
+    }
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
-        {
-            _logger = logger;
-        }
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Get(int id)
+    {
+        var forecast = await _service.GetWeatherForecastByIdAsync(id);
+        if (forecast == null) return NotFound();
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
-        {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
-        }
+        return Ok(forecast);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Post([FromBody] WeatherForecast forecast)
+    {
+        await _service.AddWeatherForecastAsync(forecast);
+        return CreatedAtAction(nameof(Get), new { id = forecast.Id }, forecast);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put(int id, [FromBody] WeatherForecast forecast)
+    {
+        if (id != forecast.Id) return BadRequest();
+
+        await _service.UpdateWeatherForecastAsync(forecast);
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _service.DeleteWeatherForecastAsync(id);
+        return NoContent();
     }
 }
