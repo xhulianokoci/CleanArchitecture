@@ -10,7 +10,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
     {
         // Build configuration
         var configuration = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../CleanArchitecture")) // Adjust path
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../CleanArchitecture"))
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
